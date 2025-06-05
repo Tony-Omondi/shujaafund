@@ -1,0 +1,14 @@
+Django==5.0.6
+psycopg2-binary==2.9.9
+requests==2.32.3
+python-decouple==3.8
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
+pillow==10.3.0
+django-parler==2.3
+social-auth-app-django==5.4.1
+twilio==9.0.5
+djangorestframework-simplejwt==5.3.1
+social-auth-app-django==5.4.1
+
+
