@@ -4,7 +4,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from .models import Fundraiser, Donation
 from .serializers import FundraiserSerializer, DonationSerializer
-from django.shortcuts import get_object_or_404
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -20,28 +19,34 @@ def create_fundraiser(request):
 
 @api_view(['GET'])
 def fundraiser_detail(request, id):
-    fundraiser = get_object_or_404(Fundraiser, id=id)
-    serializer = FundraiserSerializer(fundraiser)
-    return Response(serializer.data)
+    try:
+        fundraiser = Fundraiser.objects.get(id=id)
+        serializer = FundraiserSerializer(fundraiser)
+        return Response(serializer.data)
+    except Fundraiser.DoesNotExist:
+        return Response({'error': 'Fundraiser not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def explore_fundraisers(request):
-    category = request.query_params.get('category')
-    search = request.query_params.get('search')
     fundraisers = Fundraiser.objects.filter(is_verified=True)
-    if category:
-        fundraisers = fundraisers.filter(category__slug=category)
-    if search:
-        fundraisers = fundraisers.filter(title__icontains=search)
     serializer = FundraiserSerializer(fundraisers, many=True)
     return Response(serializer.data)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def user_dashboard(request):
-    fundraisers = Fundraiser.objects.filter(organizer=request.user)
-    donations = Donation.objects.filter(donor=request.user)
-    return Response({
-        'fundraisers': FundraiserSerializer(fundraisers, many=True).data,
-        'donations': DonationSerializer(donations, many=True).data
-    })
+def dashboard(request):
+    try:
+        # Get user's fundraisers
+        fundraisers = Fundraiser.objects.filter(organizer=request.user)
+        fundraiser_serializer = FundraiserSerializer(fundraisers, many=True)
+        
+        # Get user's donations
+        donations = Donation.objects.filter(donor=request.user)
+        donation_serializer = DonationSerializer(donations, many=True)
+        
+        return Response({
+            'fundraisers': fundraiser_serializer.data,
+            'donations': donation_serializer.data
+        })
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

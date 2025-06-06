@@ -1,8 +1,8 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework import status
 from fundraisers.models import Fundraiser
+from fundraisers.serializers import FundraiserSerializer
 from .models import Feedback, Category
 from .serializers import FeedbackSerializer, CategorySerializer
 
@@ -51,3 +51,9 @@ def feedback(request):
         serializer.save(user=request.user if request.user.is_authenticated else None)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def categories(request):
+    categories = Category.objects.all()
+    serializer = CategorySerializer(categories, many=True)
+    return Response(serializer.data)

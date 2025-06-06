@@ -14,7 +14,7 @@ class DonationSerializer(serializers.ModelSerializer):
         fields = ['id', 'amount', 'is_anonymous', 'in_memory_of', 'message', 'created_at']
 
 class FundraiserSerializer(serializers.ModelSerializer):
-    category = CategorySerializer()
+    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
     breakdowns = FundBreakdownSerializer(many=True, read_only=True)
     donations = DonationSerializer(many=True, read_only=True)
 
@@ -23,10 +23,5 @@ class FundraiserSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'story', 'goal_amount', 'amount_raised', 'category', 'urgency_deadline', 'photo', 'is_verified', 'created_at', 'shareable_link', 'breakdowns', 'donations']
 
     def create(self, validated_data):
-        category_data = validated_data.pop('category')
-        category, _ = Category.objects.get_or_create(
-            slug=category_data['slug'],
-            defaults={'translations': {'en': {'name': category_data['name']}}}
-        )
-        fundraiser = Fundraiser.objects.create(category=category, **validated_data)
+        fundraiser = Fundraiser.objects.create(**validated_data)
         return fundraiser

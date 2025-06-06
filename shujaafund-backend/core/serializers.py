@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Feedback
 
+
 class CategorySerializer(serializers.ModelSerializer):
     name = serializers.CharField()
     slug = serializers.SlugField(max_length=100)

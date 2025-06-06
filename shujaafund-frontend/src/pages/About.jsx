@@ -1,7 +1,7 @@
 // src/pages/About.jsx
 import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
-import { getAboutData } from '../services/api';
+import { getAbout } from '../services/api';
 
 function About() {
   const [data, setData] = useState({ mission: '', faq: [] });

@@ -7,4 +7,5 @@ urlpatterns = [
     path('terms-privacy/', views.terms_privacy, name='terms_privacy'),
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
     path('feedback/', views.feedback, name='feedback'),
+    path('categories/', views.categories, name='categories'),
 ]

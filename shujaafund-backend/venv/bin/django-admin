@@ -1,4 +1,4 @@
-#!/home/nito/Desktop/ShujaaFund/shujaafund-backend/venv/bin/python3.11
+#!/home/nito/Desktop/shujaafund/shujaafund-backend/venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
