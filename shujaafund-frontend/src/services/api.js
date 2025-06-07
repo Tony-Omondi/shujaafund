@@ -48,11 +48,11 @@ export const getFundraiser = (id) => API.get(`/fundraisers/${id}/`);
 export const exploreFundraisers = (params) => API.get('/fundraisers/explore/', { params });
 export const getDashboard = () => API.get('/fundraisers/dashboard/');
 export const initiatePayment = (data) => API.post('/payments/initiate/', data);
-export const getHomeData = () => API.get('/core/'); // Renamed from getHome
+export const getHomeData = () => API.get('/core/');
 export const getAbout = () => API.get('/core/about/');
-export const getTermsPrivacy = () => API.get('/core/terms-privacy/');
+export const getTermsPrivacy = () => API.get('/core/');
 export const submitFeedback = (data) => API.post('/core/feedback/');
 export const getCategories = () => API.get('/core/categories/');
-export const getAdminDashboard = () => API.get('/core/admin/');
+export const getAdminDashboard = () => API.post('/core/admin/');
 
 export default API;

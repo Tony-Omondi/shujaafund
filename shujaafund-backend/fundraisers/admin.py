@@ -6,14 +6,13 @@ class FundraiserAdmin(admin.ModelAdmin):
     list_display = ('title', 'organizer', 'category', 'goal_amount', 'amount_raised', 'is_verified', 'created_at')
     list_filter = ('is_verified', 'category')
     search_fields = ('title', 'organizer__username', 'story')
-    readonly_fields = ('created_at', 'shareable_link')
+    readonly_fields = ('created_at',)
     fieldsets = (
         (None, {'fields': ('organizer', 'title', 'story', 'category')}),
         ('Financials', {'fields': ('goal_amount', 'amount_raised')}),
-        ('Details', {'fields': ('urgency_deadline', 'photo', 'is_verified', 'shareable_link')}),
+        ('Details', {'fields': ('urgency_deadline', 'photo', 'is_verified')}),
         ('Timestamps', {'fields': ('created_at',)}),
     )
-    prepopulated_fields = {'shareable_link': ('title',)}
 
 @admin.register(Donation)
 class DonationAdmin(admin.ModelAdmin):

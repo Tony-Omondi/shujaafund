@@ -114,12 +114,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Paystack configuration
 PAYSTACK_TEST_SECRET_KEY = config('PAYSTACK_TEST_SECRET_KEY')
 PAYSTACK_TEST_PUBLIC_KEY = config('PAYSTACK_TEST_PUBLIC_KEY')
 PAYSTACK_INITIALIZE_URL = 'https://api.paystack.co/transaction/initialize'
 PAYSTACK_VERIFY_URL = 'https://api.paystack.co/transaction/verify/'
+PAYSTACK_CALLBACK_URL = 'https://your-ngrok-url.ngrok.io/api/payments/callback/'  # Update with ngrok
 
 # Google OAuth
 AUTHENTICATION_BACKENDS = (

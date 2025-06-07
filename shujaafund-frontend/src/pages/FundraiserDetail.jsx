@@ -1,21 +1,18 @@
-// src/pages/FundraiserDetail.jsx
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Button, Form, Alert } from 'react-bootstrap';
 import { usePaystackPayment } from 'react-paystack';
 import { getFundraiser, initiatePayment } from '../services/api';
-import { AppContext } from '../context/AppContext';
 
 function FundraiserDetail() {
   const { id } = useParams();
-  const { user } = useContext(AppContext);
   const [fundraiser, setFundraiser] = useState(null);
   const [donationData, setDonationData] = useState({
     amount: '',
     is_anonymous: false,
     in_memory_of: '',
     message: '',
-    email: user?.user?.email || '',
+    email: '',
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -28,28 +25,11 @@ function FundraiserDetail() {
         setFundraiser(response.data);
       } catch (err) {
         setError('Failed to load fundraiser');
+        console.error('Fetch fundraiser error:', err.response?.data || err.message);
       }
     };
     fetchFundraiser();
   }, [id]);
-
-  const config = {
-    reference: new Date().getTime().toString(),
-    email: donationData.email,
-    amount: donationData.amount * 100, // Paystack expects kobo
-    publicKey: 'pk_test_your_paystack_public_key', // Replace with PAYSTACK_TEST_PUBLIC_KEY
-  };
-
-  const onSuccess = () => {
-    setSuccess('Payment successful! Thank you for your donation.');
-    navigate('/thank-you?success=true');
-  };
-
-  const onClose = () => {
-    setError('Payment cancelled.');
-  };
-
-  const initializePayment = usePaystackPayment(config);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -61,18 +41,38 @@ function FundraiserDetail() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!donationData.email || !donationData.amount || donationData.amount < 100) {
+      setError('Please provide a valid email and amount (minimum KSh 100)');
+      return;
+    }
     try {
       const response = await initiatePayment({
         fundraiser_id: id,
         ...donationData,
       });
       if (response.data.status) {
-        initializePayment(onSuccess, onClose);
+        const config = {
+          reference: response.data.reference,
+          email: donationData.email,
+          amount: donationData.amount * 100, // Paystack expects kobo
+          publicKey: process.env.REACT_APP_PAYSTACK_PUBLIC_KEY,
+        };
+        const initializePayment = usePaystackPayment(config);
+        initializePayment(
+          () => {
+            setSuccess('Payment successful! Thank you for your donation.');
+            navigate('/thank-you?success=true');
+          },
+          () => {
+            setError('Payment cancelled.');
+          }
+        );
       } else {
         setError(response.data.message);
       }
     } catch (err) {
-      setError('Payment initiation failed');
+      console.error('Payment error:', err.response?.data || err.message);
+      setError('Payment initiation failed: ' + (err.response?.data?.message || err.message || 'Unknown error'));
     }
   };
 
@@ -142,7 +142,9 @@ function FundraiserDetail() {
                 onChange={handleChange}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">Donate with Paystack</Button>
+            <Button variant="primary" type="submit" disabled={!donationData.email || !donationData.amount}>
+              Donate with Paystack
+            </Button>
           </Form>
         </Col>
       </Row>
